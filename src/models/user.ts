@@ -1,6 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+import bcryptjs from "bcryptjs";
+
+const SALT_WORK_FACTOR = 10;
 
 const { Schema } = mongoose;
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  password?: string;
+  createdAt?: Date;
+}
 
 const userSchema = new Schema({
   name: {
@@ -25,6 +35,21 @@ const userSchema = new Schema({
   },
 });
 
-const User = mongoose.model("User", userSchema);
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
 
-export default User;
+  try {
+    const salt = await bcryptjs.genSalt(SALT_WORK_FACTOR);
+    this.password = await bcryptjs.hash(this.password, salt);
+
+    return next();
+  } catch (error: any) {
+    return next(error);
+  }
+});
+
+const UserModel = mongoose.model("User", userSchema);
+
+export default UserModel;
