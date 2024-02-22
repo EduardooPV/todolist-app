@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.route("/users").post(userController.createUser);
 
+router.route("/users/:userId").put(userController.editUser);
+
 export default router;
