@@ -1,15 +1,11 @@
 import { Request, Response } from "express";
-import UserModel, { IUser } from "../../models/user";
-
+import bcrypt from "bcryptjs";
+import UserModel from "../../models/user";
 import { ZodError, z } from "zod";
 import generateToken from "../../utils/generateToken";
 
-const createUser = async (req: Request, res: Response) => {
-  const userDataSchema = z.object({
-    name: z
-      .string({ required_error: "O campo Nome é obrigatório." })
-      .min(1, { message: "Nome deve conter 1 ou mais caracteres." })
-      .max(30, { message: "Nome deve ter menos que 30 caracteres." }),
+const loginUser = async (req: Request, res: Response) => {
+  const userBody = z.object({
     email: z.string({ required_error: "O campo Email é obrigatório." }).email(),
     password: z
       .string({ required_error: "O campo Senha é obrigatório." })
@@ -17,33 +13,43 @@ const createUser = async (req: Request, res: Response) => {
       .max(30, { message: "A senha deve ter menos que 30 caracteres." }),
   });
 
+  const { email, password } = userBody.parse(req.body);
+
   try {
-    const userBody = userDataSchema.parse(req.body);
+    const user = await UserModel.findOne({ email }).select("+password");
 
-    const userAlreadyExist = await UserModel.findOne({
-      email: userBody.email,
-    });
-
-    if (userAlreadyExist) {
-      return res.status(400).json({
+    if (!user) {
+      return res.status(404).json({
         error: true,
-        message: "Usuário já existente com esse email.",
+        message: "Usuário não encontrado.",
       });
     }
 
-    const user: IUser = await UserModel.create(userBody);
+    if (!password) {
+      return res.status(401).json({
+        error: true,
+        message: "Senha não encontrada.",
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        error: true,
+        message: "Senha incorreta, tente novamente.",
+      });
+    }
 
     const userWithoutPassword = { ...user.toObject(), password: undefined };
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id.toString());
 
-    return res.status(201).json({
-      error: false,
-      message: "Usuário criado com sucesso!",
-      data: userWithoutPassword,
+    return res.json({
+      userWithoutPassword,
       token,
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof ZodError) {
       console.log(error);
       return res.status(500).json({
@@ -61,4 +67,4 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export default createUser;
+export default loginUser;
