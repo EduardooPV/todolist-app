@@ -35,7 +35,7 @@ const createTask = async (req: Request, res: Response) => {
       title: title,
       description: description,
       status: false,
-      user: userId,
+      userId: userId,
     });
 
     return res.status(201).json({
