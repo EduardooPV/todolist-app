@@ -12,14 +12,18 @@ const updateUser = async (req: Request, res: Response) => {
         .max(30, { message: "Nome deve ter menos que 30 caracteres." }),
     });
 
-    const { userId } = req.params;
-    const { name } = userDataBody.parse(req.body);
+    const userParams = z.object({
+      userId: z.string(),
+    });
 
-    const filter = { _id: userId };
-    const update = { name };
-    const options = { new: true };
+    const { name } = userDataBody.parse(req.body);
+    const { userId } = userParams.parse(req.params);
 
     try {
+      const filter = { _id: userId };
+      const update = { name };
+      const options = { new: true };
+
       const updateUser = await UserModel.findOneAndUpdate(
         filter,
         update,
@@ -61,4 +65,4 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export default updateUser
+export default updateUser;

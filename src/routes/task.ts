@@ -2,20 +2,20 @@ import express from "express";
 
 import authenticate from "../middlewares/auth";
 
-import createTask from "../controllers/task/create";
-import getAll from "../controllers/task/getAll";
-import complete from "../controllers/task/complete";
-import update from "../controllers/task/update";
-import deleteTask from "../controllers/task/delete";
+import {
+  createTask,
+  getAllTasks,
+  updateTask,
+  deleteTask,
+  toggleTaskCompletion,
+} from "../controllers/task";
 
 const router = express.Router();
 
-router.route("/task").post(authenticate, createTask);
-router.route("/task/:userId").get(authenticate, getAll);
-router.route("/task/toggle/:taskId").patch(authenticate, complete);
-router
-  .route("/task/:taskId")
-  .put(authenticate, update)
-  .delete(authenticate, deleteTask);
+router.post("/tasks", authenticate, createTask);
+router.get("/tasks/:userId", authenticate, getAllTasks);
+router.put("/tasks/:taskId", authenticate, updateTask);
+router.delete("/tasks/:taskId", authenticate, deleteTask);
+router.patch("/tasks/:taskId/toggle", authenticate, toggleTaskCompletion);
 
 export default router;

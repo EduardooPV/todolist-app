@@ -3,7 +3,7 @@ import TaskModel from "../../models/task";
 
 import { ZodError, z } from "zod";
 
-const update = async (req: Request, res: Response) => {
+const updateTask = async (req: Request, res: Response) => {
   const taskParams = z.object({
     taskId: z.string(),
   });
@@ -21,10 +21,10 @@ const update = async (req: Request, res: Response) => {
     userId: z.string(),
   });
 
-  try {
-    const { taskId } = taskParams.parse(req.params);
-    const { title, description, userId } = taskBody.parse(req.body);
+  const { taskId } = taskParams.parse(req.params);
+  const { title, description, userId } = taskBody.parse(req.body);
 
+  try {
     const taskAlreadyExist = await TaskModel.findOne({
       _id: taskId,
       userId: userId,
@@ -70,4 +70,4 @@ const update = async (req: Request, res: Response) => {
   }
 };
 
-export default update;
+export default updateTask;

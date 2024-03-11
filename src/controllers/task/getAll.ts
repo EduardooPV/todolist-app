@@ -5,14 +5,14 @@ import UserModel from "../../models/user";
 import { ZodError, z } from "zod";
 import { createDeflate } from "zlib";
 
-const getAll = async (req: Request, res: Response) => {
+const getAllTasks = async (req: Request, res: Response) => {
   const userParams = z.object({
     userId: z.string(),
   });
 
-  try {
-    const { userId } = userParams.parse(req.params);
+  const { userId } = userParams.parse(req.params);
 
+  try {
     const userAlreadyExist = await UserModel.findOne({
       _id: userId,
     });
@@ -57,4 +57,4 @@ const getAll = async (req: Request, res: Response) => {
   }
 };
 
-export default getAll;
+export default getAllTasks;

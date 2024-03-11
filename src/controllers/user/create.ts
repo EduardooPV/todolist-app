@@ -17,9 +17,9 @@ const createUser = async (req: Request, res: Response) => {
       .max(30, { message: "A senha deve ter menos que 30 caracteres." }),
   });
 
-  try {
-    const userBody = userDataSchema.parse(req.body);
+  const userBody = userDataSchema.parse(req.body);
 
+  try {
     const userAlreadyExist = await UserModel.findOne({
       email: userBody.email,
     });

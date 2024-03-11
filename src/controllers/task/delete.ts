@@ -12,10 +12,10 @@ const deleteTask = async (req: Request, res: Response) => {
     userId: z.string(),
   });
 
-  try {
-    const { taskId } = taskParams.parse(req.params);
-    const { userId } = userIdBody.parse(req.body);
+  const { taskId } = taskParams.parse(req.params);
+  const { userId } = userIdBody.parse(req.body);
 
+  try {
     const deletedTask = await TaskModel.deleteOne({
       _id: taskId,
       userId: userId,

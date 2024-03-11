@@ -1,12 +1,16 @@
 import { Request, Response } from "express";
 import UserModel from "../../models/user";
 
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
 
 const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
+  const userParams = z.object({
+    userId: z.string(),
+  });
 
+  const { userId } = userParams.parse(req.params);
+
+  try {
     const deletedUser = await UserModel.deleteOne({
       _id: userId,
     });

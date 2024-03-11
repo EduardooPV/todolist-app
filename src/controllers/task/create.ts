@@ -17,9 +17,9 @@ const createTask = async (req: Request, res: Response) => {
     userId: z.string(),
   });
 
+  const { title, description, userId } = taskBody.parse(req.body);
+  
   try {
-    const { title, description, userId } = taskBody.parse(req.body);
-
     const userAlreadyExist = await UserModel.findOne({
       _id: userId,
     });
