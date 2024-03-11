@@ -8,11 +8,17 @@ const complete = async (req: Request, res: Response) => {
     taskId: z.string(),
   });
 
+  const userIdBody = z.object({
+    userId: z.string(),
+  });
+
   try {
     const { taskId } = taskParams.parse(req.params);
+    const { userId } = userIdBody.parse(req.body);
 
     const taskAlreadyExist = await TaskModel.findOne({
       _id: taskId,
+      userId: userId,
     });
 
     if (!taskAlreadyExist) {

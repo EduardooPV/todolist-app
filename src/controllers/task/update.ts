@@ -18,16 +18,16 @@ const update = async (req: Request, res: Response) => {
       .min(1, { message: "Nome deve conter 1 ou mais caracteres." })
       .max(100, { message: "Nome deve ter menos que 100 caracteres." })
       .optional(),
+    userId: z.string(),
   });
 
   try {
     const { taskId } = taskParams.parse(req.params);
-    const { title, description } = taskBody.parse(req.body);
-
-    console.log(title, description);
+    const { title, description, userId } = taskBody.parse(req.body);
 
     const taskAlreadyExist = await TaskModel.findOne({
       _id: taskId,
+      userId: userId,
     });
 
     if (!taskAlreadyExist) {
@@ -49,7 +49,7 @@ const update = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       error: false,
-      message: `Tarefa alterada para com sucesso.`,
+      message: `Tarefa alterada com sucesso.`,
       updateTask,
     });
   } catch (error) {

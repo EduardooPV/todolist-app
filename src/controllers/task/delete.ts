@@ -8,17 +8,23 @@ const deleteTask = async (req: Request, res: Response) => {
     taskId: z.string(),
   });
 
+  const userIdBody = z.object({
+    userId: z.string(),
+  });
+
   try {
     const { taskId } = taskParams.parse(req.params);
+    const { userId } = userIdBody.parse(req.body);
 
     const deletedTask = await TaskModel.deleteOne({
       _id: taskId,
+      userId: userId,
     });
 
     if (deletedTask.deletedCount === 0) {
       return res.status(400).json({
         error: true,
-        message: "Tarefa não encontrada ou já excluida.",
+        message: "Tarefa não encontrada, verifique o id.",
       });
     }
 
